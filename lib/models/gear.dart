@@ -1,4 +1,4 @@
-import 'gear_loan.dart';
+import '../models/gear_loan.dart';
 
 class Gear {
   const Gear(
