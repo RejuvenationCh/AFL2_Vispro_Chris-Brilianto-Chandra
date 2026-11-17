@@ -37,4 +37,18 @@ class GearRepository {
     // Item not found
     return false;
   }
+
+  bool returnGear(int id) {
+    for (var index = 0; index < _items.length; index++) {
+      final gear = _items[index];
+      if (gear.id == id) {
+        if (gear.loan == null) {
+          return false;
+        }
+        _items[index] = Gear(gear.id, gear.name);
+        return true;
+      }
+    }
+    return false;
+  }
 }

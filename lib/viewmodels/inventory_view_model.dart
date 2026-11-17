@@ -35,4 +35,12 @@ class InventoryViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  void returnGear(int id) {
+    final saved = _repository.returnGear(id);
+
+    if (saved) {
+      notifyListeners();
+    }
+  }
 }

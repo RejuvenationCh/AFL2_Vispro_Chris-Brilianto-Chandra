@@ -33,6 +33,8 @@ class InventoryPage extends StatelessWidget {
                   onTap: () {
                     if (gear.loan == null) {
                       showLendDialog(context, gear.id);
+                    } else {
+                      showReturnDialog(context, gear.id);
                     }
                   },
                 ),
@@ -49,7 +51,6 @@ class InventoryPage extends StatelessWidget {
 
   Future<void> showLendDialog(BuildContext context, int gearId) async {
     var borrower = '';
-
     final name = await showDialog<String>(
       context: context,
       builder: (dialogContext) {
@@ -76,7 +77,6 @@ class InventoryPage extends StatelessWidget {
     );
 
     if (name == null || !context.mounted) return;
-
     final today = DateTime.now();
     final dueDate = await showDatePicker(
       context: context,
@@ -86,13 +86,11 @@ class InventoryPage extends StatelessWidget {
     );
 
     if (dueDate == null || !context.mounted) return;
-
     viewModel.lendGear(gearId, name, dueDate);
   }
 
   void showAddGearDialog(BuildContext context) {
     var name = '';
-
     showDialog<void>(
       context: context,
       builder: (dialogContext) {
@@ -112,6 +110,33 @@ class InventoryPage extends StatelessWidget {
                 }
               },
               child: const Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void showReturnDialog(BuildContext context, int gearId) {
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Return gear?'),
+          content: const Text('Mark this item as available again?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext);
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                viewModel.returnGear(gearId);
+                Navigator.pop(dialogContext);
+              },
+              child: const Text('Mark returned'),
             ),
           ],
         );
