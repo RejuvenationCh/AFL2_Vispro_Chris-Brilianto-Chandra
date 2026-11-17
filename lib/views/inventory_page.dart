@@ -20,6 +20,38 @@ class InventoryPage extends StatelessWidget {
                 for (final gear in items) ListTile(title: Text(gear.name)),
               ],
             ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => showAddGearDialog(context),
+        label: const Text('Add gear'),
+      ),
+    );
+  }
+
+  void showAddGearDialog(BuildContext context) {
+    var name = '';
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Add gear'),
+          content: TextField(
+            decoration: const InputDecoration(labelText: 'Gear name'),
+            onChanged: (value) {
+              name = value;
+            },
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                if (viewModel.addGear(name)) {
+                  Navigator.pop(dialogContext);
+                }
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
