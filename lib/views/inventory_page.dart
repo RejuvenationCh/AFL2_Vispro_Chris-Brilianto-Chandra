@@ -32,7 +32,10 @@ class InventoryPage extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                         builder: (context) {
-                          return GearDetailsPage(gear);
+                          return GearDetailsPage(
+                            gear,
+                            viewModel,
+                          );
                         },
                       ),
                     );
@@ -55,50 +58,6 @@ class InventoryPage extends StatelessWidget {
       return 'Available';
     } else {
       return 'On loan to ${loan.borrower}';
-    }
-  }
-
-  Future<void> showLendDialog(BuildContext context, int gearId) async {
-    var borrower = '';
-    final name = await showDialog<String>(
-      context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          title: const Text('Lend gear'),
-          content: TextField(
-            decoration: const InputDecoration(labelText: 'Borrower name'),
-            onChanged: (value) {
-              borrower = value;
-            },
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                if (borrower.trim().isNotEmpty) {
-                  Navigator.pop(dialogContext, borrower);
-                }
-              },
-              child: const Text('Choose due date'),
-            ),
-          ],
-        );
-      },
-    );
-
-    if (name == null || !context.mounted) return;
-    final today = DateTime.now();
-    final dueDate = await showDatePicker(
-      context: context,
-      initialDate: today,
-      firstDate: today,
-      lastDate: DateTime(today.year + 5),
-    );
-
-    if (dueDate == null || !context.mounted) return;
-    try {
-      viewModel.lendGear(gearId, name, dueDate);
-    } catch (_) {
-      showSaveError(context);
     }
   }
 
