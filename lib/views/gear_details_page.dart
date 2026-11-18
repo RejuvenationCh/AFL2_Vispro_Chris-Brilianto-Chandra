@@ -1,16 +1,23 @@
 import 'package:flutter/material.dart';
 
+import '../models/gear.dart';
+
 class GearDetailsPage extends StatelessWidget {
-  const GearDetailsPage({super.key});
+  const GearDetailsPage(
+    this.gear, {
+    super.key,
+  });
+
+  final Gear gear;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Gear details'),
+        title: Text(gear.name),
       ),
-      body: const Center(
-        child: Text('Gear information goes here'),
+      body: Center(
+        child: Text(gear.name),
       ),
     );
   }

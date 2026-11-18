@@ -32,7 +32,7 @@ class InventoryPage extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                         builder: (context) {
-                          return const GearDetailsPage();
+                          return GearDetailsPage(gear);
                         },
                       ),
                     );
