@@ -1,10 +1,10 @@
 import 'package:flutter/foundation.dart';
 
-import '../models/gear.dart';
-import '../models/gear_loan.dart';
+import '../domain/models/gear.dart';
+import '../domain/models/gear_loan.dart';
 import '../domain/repositories/gear_repository.dart';
-import 'inventory_state.dart';
-import 'gear_action_state.dart';
+import 'states/inventory_state.dart';
+import 'states/gear_action_state.dart';
 
 class InventoryViewModel extends ChangeNotifier {
   InventoryViewModel(this._repository);

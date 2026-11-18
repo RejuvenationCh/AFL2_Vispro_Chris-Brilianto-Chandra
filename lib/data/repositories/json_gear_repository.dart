@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
-import '../../models/gear.dart';
-import '../../models/gear_loan.dart';
+import '../../domain/models/gear.dart';
+import '../../domain/models/gear_loan.dart';
 
 import '../../domain/repositories/gear_repository.dart';
 

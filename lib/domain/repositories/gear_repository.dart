@@ -1,5 +1,5 @@
-import '../../models/gear.dart';
-import '../../models/gear_loan.dart';
+import '../models/gear.dart';
+import '../models/gear_loan.dart';
 
 abstract interface class GearRepository {
   Future<void> load();

@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import '../models/gear.dart';
+import '../../domain/models/gear.dart';
 
 sealed class InventoryState extends Equatable {
   const InventoryState();

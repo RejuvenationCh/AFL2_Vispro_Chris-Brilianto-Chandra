@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../viewmodels/inventory_view_model.dart';
-import '../viewmodels/inventory_state.dart';
-import '../models/gear.dart';
+import '../viewmodels/states/inventory_state.dart';
+import '../domain/models/gear.dart';
 import 'gear_details_page.dart';
 import 'widgets/action_feedback.dart';
 

@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import '../models/gear_loan.dart';
+import 'gear_loan.dart';
 
 class Gear extends Equatable {
   const Gear(

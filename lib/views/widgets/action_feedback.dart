@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../viewmodels/gear_action_state.dart';
+import '../../viewmodels/states/gear_action_state.dart';
 
 class ActionFeedback extends StatelessWidget {
   const ActionFeedback(

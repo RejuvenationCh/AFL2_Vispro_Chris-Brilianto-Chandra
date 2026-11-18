@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../models/gear.dart';
+import '../domain/models/gear.dart';
 import '../viewmodels/inventory_view_model.dart';
 import 'widgets/action_feedback.dart';
 
