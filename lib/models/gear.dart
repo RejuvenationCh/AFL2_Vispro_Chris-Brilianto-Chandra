@@ -1,6 +1,8 @@
+import 'package:equatable/equatable.dart';
+
 import '../models/gear_loan.dart';
 
-class Gear {
+class Gear extends Equatable {
   const Gear(
     this.id,
     this.name, {
@@ -10,6 +12,9 @@ class Gear {
   final int id;
   final String name;
   final GearLoan? loan;
+
+  @override
+  List<Object?> get props => [id, name, loan];
 
   Map<String, dynamic> toJson() {
     return {

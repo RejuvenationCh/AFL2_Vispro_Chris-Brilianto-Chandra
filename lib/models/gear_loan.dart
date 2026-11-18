@@ -1,4 +1,6 @@
-class GearLoan {
+import 'package:equatable/equatable.dart';
+
+class GearLoan extends Equatable {
   const GearLoan(
     this.borrower,
     this.dueDate,
@@ -6,6 +8,9 @@ class GearLoan {
 
   final String borrower;
   final DateTime dueDate;
+
+  @override
+  List<Object?> get props => [borrower, dueDate];
 
   Map<String, dynamic> toJson() {
     return {
