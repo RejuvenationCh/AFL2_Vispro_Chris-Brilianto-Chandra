@@ -7,7 +7,7 @@ class MemoryGearRepository implements GearRepository {
   int _nextId = 1;
 
   @override
-  void load() {}
+  Future<void> load() async {}
 
   @override
   List<Gear> list() {
@@ -15,13 +15,13 @@ class MemoryGearRepository implements GearRepository {
   }
 
   @override
-  void add(String name) {
+  Future<void> add(String name) async {
     _items.add(Gear(_nextId, name));
     _nextId++;
   }
 
   @override
-  bool lend(int id, GearLoan loan) {
+  Future<bool> lend(int id, GearLoan loan) async {
     for (var index = 0; index < _items.length; index++) {
       final gear = _items[index];
       if (gear.id == id) {
@@ -35,7 +35,7 @@ class MemoryGearRepository implements GearRepository {
   }
 
   @override
-  bool returnGear(int id) {
+  Future<bool> returnGear(int id) async {
     for (var index = 0; index < _items.length; index++) {
       final gear = _items[index];
       if (gear.id == id) {

@@ -14,11 +14,11 @@ class JsonGearRepository implements GearRepository {
   int _nextId = 1;
 
   @override
-  void add(String name) {
+  Future<void> add(String name) async {
     final gear = Gear(_nextId, name);
     _items.add(gear);
     try {
-      _save();
+      await _save();
       _nextId++;
     } catch (_) {
       _items.removeLast();
@@ -33,7 +33,7 @@ class JsonGearRepository implements GearRepository {
 
   // Return false if item is on a loan or is not existed into existence yet
   @override
-  bool lend(int id, GearLoan loan) {
+  Future<bool> lend(int id, GearLoan loan) async {
     for (var index = 0; index < _items.length; index++) {
       final gear = _items[index];
 
@@ -48,7 +48,7 @@ class JsonGearRepository implements GearRepository {
           loan: loan,
         );
         try {
-          _save();
+          await _save();
         } catch (_) {
           _items[index] = gear;
           rethrow;
@@ -62,7 +62,7 @@ class JsonGearRepository implements GearRepository {
   }
 
   @override
-  bool returnGear(int id) {
+  Future<bool> returnGear(int id) async {
     for (var index = 0; index < _items.length; index++) {
       final gear = _items[index];
       if (gear.id == id) {
@@ -71,7 +71,7 @@ class JsonGearRepository implements GearRepository {
         }
         _items[index] = Gear(gear.id, gear.name);
         try {
-          _save();
+          await _save();
         } catch (_) {
           _items[index] = gear;
           rethrow;
@@ -83,10 +83,10 @@ class JsonGearRepository implements GearRepository {
   }
 
   @override
-  void load() {
-    if (!_file.existsSync()) return;
+  Future<void> load() async {
+    if (!await _file.exists()) return;
 
-    final text = _file.readAsStringSync();
+    final text = await _file.readAsString();
     final rows = jsonDecode(text) as List<dynamic>;
     final savedItems = <Gear>[];
     var nextId = 1;
@@ -102,14 +102,14 @@ class JsonGearRepository implements GearRepository {
     _nextId = nextId;
   }
 
-  void _save() {
+  Future<void> _save() async {
     final rows = <Map<String, dynamic>>[];
     for (final gear in _items) {
       rows.add(gear.toJson());
     }
 
     final temporary = File('${_file.path}.tmp');
-    temporary.writeAsStringSync(jsonEncode(rows), flush: true);
-    temporary.renameSync(_file.path);
+    await temporary.writeAsString(jsonEncode(rows), flush: true);
+    await temporary.rename(_file.path);
   }
 }

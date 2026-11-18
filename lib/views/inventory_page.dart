@@ -4,6 +4,7 @@ import '../viewmodels/inventory_view_model.dart';
 import '../viewmodels/inventory_state.dart';
 import '../models/gear.dart';
 import 'gear_details_page.dart';
+import 'widgets/action_feedback.dart';
 
 class InventoryPage extends StatelessWidget {
   const InventoryPage(this.viewModel, {super.key});
@@ -91,41 +92,57 @@ class InventoryPage extends StatelessWidget {
 
   void showAddGearDialog(BuildContext context) {
     var name = '';
+    viewModel.resetAction();
     showDialog<void>(
       context: context,
+      barrierDismissible: false,
       builder: (dialogContext) {
-        return AlertDialog(
-          title: const Text('Add gear'),
-          content: TextField(
-            decoration: const InputDecoration(labelText: 'Gear name'),
-            onChanged: (value) {
-              name = value;
-            },
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                try {
-                  if (viewModel.addGear(name)) {
-                    Navigator.pop(dialogContext);
-                  }
-                } catch (_) {
-                  showSaveError(context);
-                }
-              },
-              child: const Text('Save'),
-            ),
-          ],
+        return ListenableBuilder(
+          listenable: viewModel,
+          builder: (context, child) {
+            return PopScope(
+              canPop: !viewModel.isSaving,
+              child: AlertDialog(
+                title: const Text('Add gear'),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      enabled: !viewModel.isSaving,
+                      decoration: const InputDecoration(labelText: 'Gear name'),
+                      onChanged: (value) {
+                        name = value;
+                      },
+                    ),
+                    ActionFeedback(viewModel.actionState),
+                  ],
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: viewModel.isSaving
+                        ? null
+                        : () {
+                            Navigator.pop(dialogContext);
+                          },
+                    child: const Text('Cancel'),
+                  ),
+                  TextButton(
+                    onPressed: viewModel.isSaving
+                        ? null
+                        : () async {
+                            final saved = await viewModel.addGear(name);
+                            if (dialogContext.mounted && saved) {
+                              Navigator.pop(dialogContext);
+                            }
+                          },
+                    child: const Text('Save'),
+                  ),
+                ],
+              ),
+            );
+          },
         );
       },
-    );
-  }
-
-  void showSaveError(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Could not save your change. Try again.'),
-      ),
     );
   }
 }

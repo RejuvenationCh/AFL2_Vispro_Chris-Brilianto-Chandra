@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/gear.dart';
 import '../viewmodels/inventory_view_model.dart';
+import 'widgets/action_feedback.dart';
 
 class GearDetailsPage extends StatelessWidget {
   const GearDetailsPage(
@@ -68,86 +69,152 @@ class GearDetailsPage extends StatelessWidget {
     }
   }
 
-  Future<void> showLendDialog(BuildContext context, int gearId) async {
+  void showLendDialog(BuildContext context, int gearId) {
     var borrower = '';
-    final name = await showDialog<String>(
+    DateTime? dueDate;
+    viewModel.resetAction();
+
+    showDialog<void>(
       context: context,
+      barrierDismissible: false,
       builder: (dialogContext) {
-        return AlertDialog(
-          title: const Text('Lend gear'),
-          content: TextField(
-            decoration: const InputDecoration(labelText: 'Borrower name'),
-            onChanged: (value) {
-              borrower = value;
-            },
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                if (borrower.trim().isNotEmpty) {
-                  Navigator.pop(dialogContext, borrower);
+        return StatefulBuilder(
+          builder: (context, updateDate) {
+            return ListenableBuilder(
+              listenable: viewModel,
+              builder: (context, child) {
+                var dateLabel = 'Choose due date';
+                if (dueDate != null) {
+                  dateLabel = MaterialLocalizations.of(context)
+                      .formatMediumDate(dueDate!);
                 }
+
+                return PopScope(
+                  canPop: !viewModel.isSaving,
+                  child: AlertDialog(
+                    title: const Text('Lend gear'),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextField(
+                          enabled: !viewModel.isSaving,
+                          decoration: const InputDecoration(
+                            labelText: 'Borrower name',
+                          ),
+                          onChanged: (value) {
+                            borrower = value;
+                          },
+                        ),
+                        TextButton(
+                          onPressed: viewModel.isSaving
+                              ? null
+                              : () async {
+                                  final today = DateUtils.dateOnly(
+                                    DateTime.now(),
+                                  );
+                                  final currentDate = dueDate ?? today;
+                                  final picked = await showDatePicker(
+                                    context: dialogContext,
+                                    initialDate: currentDate,
+                                    firstDate: currentDate.isBefore(today)
+                                        ? currentDate
+                                        : today,
+                                    lastDate: DateTime(today.year + 5),
+                                  );
+                                  if (!dialogContext.mounted ||
+                                      picked == null) {
+                                    return;
+                                  }
+                                  updateDate(() {
+                                    dueDate = picked;
+                                  });
+                                },
+                          child: Text(dateLabel),
+                        ),
+                        ActionFeedback(viewModel.actionState),
+                      ],
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: viewModel.isSaving
+                            ? null
+                            : () {
+                                Navigator.pop(dialogContext);
+                              },
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: viewModel.isSaving
+                            ? null
+                            : () async {
+                                final saved = await viewModel.lendGear(
+                                  gearId,
+                                  borrower,
+                                  dueDate,
+                                );
+                                if (dialogContext.mounted && saved) {
+                                  Navigator.pop(dialogContext);
+                                }
+                              },
+                        child: const Text('Lend gear'),
+                      ),
+                    ],
+                  ),
+                );
               },
-              child: const Text('Choose due date'),
-            ),
-          ],
+            );
+          },
         );
       },
     );
-
-    if (name == null || !context.mounted) return;
-    final today = DateTime.now();
-    final dueDate = await showDatePicker(
-      context: context,
-      initialDate: today,
-      firstDate: today,
-      lastDate: DateTime(today.year + 5),
-    );
-
-    if (dueDate == null || !context.mounted) return;
-    try {
-      viewModel.lendGear(gearId, name, dueDate);
-    } catch (_) {
-      showSaveError(context);
-    }
   }
 
   void showReturnDialog(BuildContext context, int gearId) {
+    viewModel.resetAction();
     showDialog<void>(
       context: context,
+      barrierDismissible: false,
       builder: (dialogContext) {
-        return AlertDialog(
-          title: const Text('Return gear?'),
-          content: const Text('Mark this item as available again?'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(dialogContext);
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                try {
-                  viewModel.returnGear(gearId);
-                  Navigator.pop(dialogContext);
-                } catch (_) {
-                  showSaveError(context);
-                }
-              },
-              child: const Text('Mark returned'),
-            ),
-          ],
+        return ListenableBuilder(
+          listenable: viewModel,
+          builder: (context, child) {
+            return PopScope(
+              canPop: !viewModel.isSaving,
+              child: AlertDialog(
+                title: const Text('Return gear?'),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text('Mark this item as available again?'),
+                    ActionFeedback(viewModel.actionState),
+                  ],
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: viewModel.isSaving
+                        ? null
+                        : () {
+                            Navigator.pop(dialogContext);
+                          },
+                    child: const Text('Cancel'),
+                  ),
+                  TextButton(
+                    onPressed: viewModel.isSaving
+                        ? null
+                        : () async {
+                            final saved = await viewModel.returnGear(gearId);
+                            if (dialogContext.mounted && saved) {
+                              Navigator.pop(dialogContext);
+                            }
+                          },
+                    child: const Text('Mark returned'),
+                  ),
+                ],
+              ),
+            );
+          },
         );
       },
-    );
-  }
-
-  void showSaveError(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Could not save your change. Try again.'),
-      ),
     );
   }
 }

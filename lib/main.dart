@@ -15,7 +15,7 @@ Future<void> main() async {
     final file = File('${folder.path}/gear.json');
     final repository = JsonGearRepository(file);
     final viewModel = InventoryViewModel(repository);
-    viewModel.load();
+    await viewModel.load();
 
     runApp(
       MaterialApp(
