@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../viewmodels/inventory_view_model.dart';
+import '../models/gear.dart';
+import 'gear_details_page.dart';
 
 class InventoryPage extends StatelessWidget {
   const InventoryPage(this.viewModel, {super.key});
@@ -21,21 +23,19 @@ class InventoryPage extends StatelessWidget {
           body: ListView(
             children: [
               if (items.isEmpty) const ListTile(title: Text('No gear yet')),
-
               for (final gear in items)
                 ListTile(
                   title: Text(gear.name),
-                  subtitle: Text(
-                    gear.loan == null
-                        ? 'Available'
-                        : 'On loan to ${gear.loan!.borrower}',
-                  ),
+                  subtitle: Text(gearStatus(gear)),
                   onTap: () {
-                    if (gear.loan == null) {
-                      showLendDialog(context, gear.id);
-                    } else {
-                      showReturnDialog(context, gear.id);
-                    }
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return const GearDetailsPage();
+                        },
+                      ),
+                    );
                   },
                 ),
             ],
@@ -47,6 +47,15 @@ class InventoryPage extends StatelessWidget {
         );
       },
     );
+  }
+
+  String gearStatus(Gear gear) {
+    final loan = gear.loan;
+    if (loan == null) {
+      return 'Available';
+    } else {
+      return 'On loan to ${loan.borrower}';
+    }
   }
 
   Future<void> showLendDialog(BuildContext context, int gearId) async {
