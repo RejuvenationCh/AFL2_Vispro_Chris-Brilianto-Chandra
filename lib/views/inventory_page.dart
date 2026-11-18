@@ -93,37 +93,6 @@ class InventoryPage extends StatelessWidget {
     );
   }
 
-  void showReturnDialog(BuildContext context, int gearId) {
-    showDialog<void>(
-      context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          title: const Text('Return gear?'),
-          content: const Text('Mark this item as available again?'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(dialogContext);
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                try {
-                  viewModel.returnGear(gearId);
-                  Navigator.pop(dialogContext);
-                } catch (_) {
-                  showSaveError(context);
-                }
-              },
-              child: const Text('Mark returned'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   void showSaveError(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
