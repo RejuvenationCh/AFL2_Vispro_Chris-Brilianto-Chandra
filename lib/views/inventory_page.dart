@@ -86,7 +86,11 @@ class InventoryPage extends StatelessWidget {
     );
 
     if (dueDate == null || !context.mounted) return;
-    viewModel.lendGear(gearId, name, dueDate);
+    try {
+      viewModel.lendGear(gearId, name, dueDate);
+    } catch (_) {
+      showSaveError(context);
+    }
   }
 
   void showAddGearDialog(BuildContext context) {
@@ -105,8 +109,12 @@ class InventoryPage extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () {
-                if (viewModel.addGear(name)) {
-                  Navigator.pop(dialogContext);
+                try {
+                  if (viewModel.addGear(name)) {
+                    Navigator.pop(dialogContext);
+                  }
+                } catch (_) {
+                  showSaveError(context);
                 }
               },
               child: const Text('Save'),
@@ -133,14 +141,26 @@ class InventoryPage extends StatelessWidget {
             ),
             TextButton(
               onPressed: () {
-                viewModel.returnGear(gearId);
-                Navigator.pop(dialogContext);
+                try {
+                  viewModel.returnGear(gearId);
+                  Navigator.pop(dialogContext);
+                } catch (_) {
+                  showSaveError(context);
+                }
               },
               child: const Text('Mark returned'),
             ),
           ],
         );
       },
+    );
+  }
+
+  void showSaveError(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Could not save your change. Try again.'),
+      ),
     );
   }
 }
