@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 
-import 'repository/gear_repository.dart';
+import 'data/repositories/json_gear_repository.dart';
 import 'viewmodels/inventory_view_model.dart';
 import 'views/inventory_page.dart';
 
@@ -13,7 +13,7 @@ Future<void> main() async {
   try {
     final folder = await getApplicationSupportDirectory();
     final file = File('${folder.path}/gear.json');
-    final repository = GearRepository(file);
+    final repository = JsonGearRepository(file);
     repository.load();
     final viewModel = InventoryViewModel(repository);
 

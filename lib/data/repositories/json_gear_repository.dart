@@ -1,16 +1,19 @@
 import 'dart:convert';
 import 'dart:io';
 
-import '../models/gear.dart';
-import '../models/gear_loan.dart';
+import '../../models/gear.dart';
+import '../../models/gear_loan.dart';
 
-class GearRepository {
-  GearRepository(this._file);
+import '../../domain/repositories/gear_repository.dart';
+
+class JsonGearRepository implements GearRepository {
+  JsonGearRepository(this._file);
 
   final File _file;
   final List<Gear> _items = [];
   int _nextId = 1;
 
+  @override
   void add(String name) {
     final gear = Gear(_nextId, name);
     _items.add(gear);
@@ -23,11 +26,13 @@ class GearRepository {
     }
   }
 
+  @override
   List<Gear> list() {
     return List.of(_items);
   }
 
   // Return false if item is on a loan or is not existed into existence yet
+  @override
   bool lend(int id, GearLoan loan) {
     for (var index = 0; index < _items.length; index++) {
       final gear = _items[index];
@@ -56,6 +61,7 @@ class GearRepository {
     return false;
   }
 
+  @override
   bool returnGear(int id) {
     for (var index = 0; index < _items.length; index++) {
       final gear = _items[index];
@@ -76,6 +82,7 @@ class GearRepository {
     return false;
   }
 
+  @override
   void load() {
     if (!_file.existsSync()) return;
 

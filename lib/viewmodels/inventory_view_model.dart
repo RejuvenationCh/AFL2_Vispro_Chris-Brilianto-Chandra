@@ -1,5 +1,5 @@
 import '../models/gear.dart';
-import '../repository/gear_repository.dart';
+import '../domain/repositories/gear_repository.dart';
 import '../models/gear_loan.dart';
 
 import 'package:flutter/foundation.dart';
