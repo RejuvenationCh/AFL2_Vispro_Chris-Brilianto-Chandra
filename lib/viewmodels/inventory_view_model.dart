@@ -4,13 +4,43 @@ import '../models/gear_loan.dart';
 
 import 'package:flutter/foundation.dart';
 
+import 'inventory_state.dart';
+
 class InventoryViewModel extends ChangeNotifier {
   InventoryViewModel(this._repository);
+
+  InventoryState _state = const InventoryLoading();
+  InventoryState get state => _state;
 
   final GearRepository _repository;
 
   List<Gear> get items {
-    return _repository.list();
+    final currentState = _state;
+    if (currentState is InventoryLoaded) {
+      return currentState.items;
+    }
+    return const [];
+  }
+
+  void load() {
+    _setState(const InventoryLoading());
+    try {
+      _repository.load();
+      _refreshItems();
+    } catch (_) {
+      _setState(const InventoryError('Could not load your gear. Try again.'));
+    }
+  }
+
+  void _refreshItems() {
+    _setState(InventoryLoaded(_repository.list()));
+  }
+
+  void _setState(InventoryState nextState) {
+    if (_state == nextState) return;
+
+    _state = nextState;
+    notifyListeners();
   }
 
   bool addGear(String name) {
@@ -20,7 +50,7 @@ class InventoryViewModel extends ChangeNotifier {
     }
 
     _repository.add(cleanName);
-    notifyListeners();
+    _refreshItems();
     return true;
   }
 
@@ -32,7 +62,7 @@ class InventoryViewModel extends ChangeNotifier {
     final saved = _repository.lend(id, loan);
 
     if (saved) {
-      notifyListeners();
+      _refreshItems();
     }
   }
 
@@ -40,7 +70,7 @@ class InventoryViewModel extends ChangeNotifier {
     final saved = _repository.returnGear(id);
 
     if (saved) {
-      notifyListeners();
+      _refreshItems();
     }
   }
 }

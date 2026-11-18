@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../viewmodels/inventory_view_model.dart';
+import '../viewmodels/inventory_state.dart';
 import '../models/gear.dart';
 import 'gear_details_page.dart';
 
@@ -14,6 +15,33 @@ class InventoryPage extends StatelessWidget {
     return ListenableBuilder(
       listenable: viewModel,
       builder: (context, child) {
+        final state = viewModel.state;
+
+        switch (state) {
+          case InventoryLoading():
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          case InventoryError():
+            return Scaffold(
+              appBar: AppBar(title: const Text('Gear Loan Log')),
+              body: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(state.message),
+                    TextButton(
+                      onPressed: viewModel.load,
+                      child: const Text('Try again'),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          case InventoryLoaded():
+            break;
+        }
+
         final items = viewModel.items;
 
         return Scaffold(
